@@ -9,6 +9,9 @@ use types::{Bytes, H256, TransactionReceipt, TransactionRequest, U256};
 use helpers::CallFuture;
 use {Error, Transport};
 
+use std::{thread};
+
+
 /// Checks whether an event has been confirmed.
 pub trait ConfirmationCheck {
     /// Future resolved when is known whether an event has been confirmed.
@@ -280,6 +283,8 @@ impl<T: Transport> Future for SendTransactionWithConfirmation<T> {
                     SendTransactionWithConfirmationState::GetTransactionReceipt(receipt_future)
                 }
                 SendTransactionWithConfirmationState::GetTransactionReceipt(ref mut future) => {
+                    let ten_sec = Duration::from_millis(10000);
+                    thread::sleep(ten_sec);
                     let receipt = try_ready!(Future::poll(future)).expect("receipt can't be null after wait for confirmations; qed");
                     return Ok(receipt.into());
                 }
